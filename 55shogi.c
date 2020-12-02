@@ -274,6 +274,38 @@ void show()
 }
 
 
+void game()
+{
+    int res;
+    init();
+
+    while (1)
+    {
+        show();
+        res = (gTurn == PLAYER ? player() : ai());
+        if (res == PLAYER_WIN)
+        {
+            show();
+            youWin();
+            break;
+        }
+        if (res == AI_WIN)
+        {
+            show();
+            youLose();
+            break;
+        }
+
+        swapTurn(); // ターン交代
+
+        if (gCnt > 150) // 150手を超えて決着が着かなければ引き分け
+        {
+            draw();
+            break;
+        }
+    }
+}
+
 int main()
 {
     int x;

@@ -273,6 +273,22 @@ void show()
     puts("\n");
 }
 
+int onTheBoard(int y, int x) // ボード上なら1, それ以外は0
+{
+    if (0 <= y && y < 5 && 0 <= x && x < 5)
+        return 1;
+    else
+        return 0;
+}
+
+int isInTekijin(int y) // 敵陣の中なら1, そうでないなら0
+{
+    if (gTurn == PLAYER)
+        return y == 4;
+    else
+        return y == 0;
+}
+
 
 void game()
 {

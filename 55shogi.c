@@ -119,6 +119,30 @@ int main()
 {
 }
 
+int max(int a, int b)
+{
+    return (a > b ? a : b);
+}
+
+void youWin()
+{
+    puts("You Win");
+}
+
+void youLose()
+{
+    puts("You Lose");
+}
+
+void draw()
+{
+    puts("Draw");
+}
+
+void swapTurn()
+{
+    gTurn = (gTurn == PLAYER ? AI : PLAYER);
+}
 
 char *int2KomaName(int n)
 {

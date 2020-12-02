@@ -348,6 +348,36 @@ int writeLogAndCheckSennnichite() // ログを記録し、千日手であるな�
     return (sameBoardCnt >= 4 ? FOUL_PLAY : VALID_PLAY);
 }
 
+
+int place(int y, int x, int koma, int n, int dryRun, int verbose)
+// n手先まで読んで勝てるならWILL_WIN、負けるならWILL_LOSE、いずれでもないならEQUAL_FIGHTを返す。
+// 打ち歩詰め以外の反則手が渡された場合は0手先で負けるとみなす。
+// 引数のdryRunについて、実際に駒を動かさず駒を試しに動かしてみた結果のみが欲しいときはdryRun = 1とする。
+{
+    printf("place(y=%d, x=%d, koma=%d, n=%d, dryRun=%d)\n", y, x, koma, n, dryRun);
+    int isPlacable = placable(y, x, koma, verbose);
+
+    if (!isPlacable)
+        return WILL_LOSE;
+
+    gKomaStock[gTurn][koma]--;
+    gWhich[y][x] = gTurn;
+    gBoard[y][x] = koma;
+    gCnt++;
+
+    int judgeResult = judge(n, verbose);
+
+    if (dryRun)
+    {
+        gKomaStock[gTurn][koma]++;
+        gBoard[y][x] = NONE;
+        gWhich[y][x] = NEUTRAL;
+        gCnt--;
+    }
+
+    return judgeResult;
+}
+
 int movable(int y1, int x1, int y2, int x2, int nari, int verbose)
 // 動かせるなら1, 動かせないなら0を返す
 {

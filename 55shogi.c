@@ -272,3 +272,20 @@ void show()
 
     puts("\n");
 }
+
+
+int main()
+{
+    int x;
+    puts("先手なら0、後手なら1を入力してください。");
+    scanf("%d", &x);
+    if (x == 0)
+    {
+        gTurn = gSente = PLAYER;
+    }
+    else
+        gTurn = gSente = AI;
+
+    game();
+    return 0;
+}

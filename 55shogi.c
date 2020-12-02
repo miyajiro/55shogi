@@ -290,6 +290,38 @@ int isInTekijin(int y) // 敵陣の中なら1, そうでないなら0
 }
 
 
+int player() // プレイヤーの勝ちならPLAYER_WIN, 負けならAI_WIN, 続けるならCONTINUE_FIGHT
+{
+    puts("[Player Turn]");
+    scanf("%s", gOrder);
+    int res = executeOrder(gOrder);
+    switch (res)
+    {
+    case CHECK_MATE:
+        return PLAYER_WIN;
+    case FOUL_PLAY:
+        return AI_WIN;
+    case VALID_PLAY:
+        return CONITNUE_FIGHT;
+    }
+}
+
+int ai() // プレイヤーの勝ちならPLAYER_WIN, 負けならAI_WIN, 続けるならCONTINUE_FIGHT
+{
+    puts("[AI Turn]");
+    scanf("%s", gOrder);
+    switch (executeOrder(gOrder))
+    {
+    case CHECK_MATE:
+        return AI_WIN;
+    case FOUL_PLAY:
+        return PLAYER_WIN;
+    case VALID_PLAY:
+        return CONITNUE_FIGHT;
+    }
+}
+
+
 void game()
 {
     int res;

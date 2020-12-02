@@ -115,10 +115,6 @@ int *gVY[10];
 int *gVX[10];
 int gVL[10];
 
-int main()
-{
-}
-
 int max(int a, int b)
 {
     return (a > b ? a : b);
@@ -289,6 +285,64 @@ int isInTekijin(int y) // 敵陣の中なら1, そうでないなら0
         return y == 0;
 }
 
+
+
+int executeOrder(char *order) // 相手を詰ませたらCHECK_MATE, 反則ならFOUL_PLAY, いずれでもないならVALID_PLAY
+{
+    int i, j, res;
+    int orderLen = strlen(order);
+
+    if (!(orderLen == 4 || orderLen == 5)) // 4, 5文字以外反則
+        return FOUL_PLAY;
+
+    if (!('1' <= order[0] && order[0] <= '5' && 'A' <= order[1] && order[1] <= 'E')) // 命令の最初2文字が1A~5Eでなければ反則
+        return FOUL_PLAY;
+
+    int y1 = order[0] - '1';
+    int x1 = order[1] - 'A';
+
+    if ('1' <= order[2] && order[2] <= '5' && 'A' <= order[3] && order[3] <= 'E')
+    { // 命令の3~4文字目が1A~5Eである場合はコマを動かす。
+        int y2 = order[2] - '1';
+        int x2 = order[3] - 'A';
+
+        if (orderLen == 5 && order[4] != 'N') // 5文字目があるのにNじゃないなら反則
+            return FOUL_PLAY;
+
+        int nari = (orderLen == 5);
+        res = move(y1, x1, y2, x2, nari, /* n = */ 2, /* dryRun = */ 0, /* verbose = */ 1);
+        if (res == WILL_WIN) // 2手以内に勝てる(=相手が王手を回避できない)ときは勝利
+            return CHECK_MATE;
+        if (res == WILL_LOSE) // 2手以内に負けるときは反則
+            return FOUL_PLAY;
+    }
+    else
+    {
+        if (orderLen == 5) // コマを置くときに成ると反則
+            return FOUL_PLAY;
+
+        order[0] = order[2];
+        order[1] = order[3];
+        order[2] = '\0';
+
+        int koma = komaName2Int(order);
+
+        if (koma == -1) // コマが指定されていない場合反則
+            return FOUL_PLAY;
+
+        res = place(y1, x1, koma, /* n = */ 2, /* dryRun = */ 0, /* verbose = */ 1);
+        if (res == WILL_WIN) // 2手以内に勝てる(=相手が王手を回避できない)ときは勝利
+        {
+            if (koma == FU) // 打ち歩詰め
+                return FOUL_PLAY;
+            return CHECK_MATE;
+        }
+        if (res == WILL_LOSE) // 2手以内に負けるときは反則
+            return FOUL_PLAY;
+    }
+
+    return VALID_PLAY;
+}
 
 int player() // プレイヤーの勝ちならPLAYER_WIN, 負けならAI_WIN, 続けるならCONTINUE_FIGHT
 {

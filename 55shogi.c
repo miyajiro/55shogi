@@ -349,6 +349,55 @@ int writeLogAndCheckSennnichite() // ログを記録し、千日手であるな�
 }
 
 
+int move(int y1, int x1, int y2, int x2, int nari, int n, int dryRun, int verbose)
+// n手先まで読んで勝てるならWILL_WIN、負けるならWILL_LOSE、いずれでもないならEQUAL_FIGHTを返す。
+// 王を取ったときは0手先で勝ち、反則手が渡された場合は0手先で負けるとみなす。
+// 引数のdryRunについて、実際に駒を動かさず駒を試しに動かしてみた結果のみが欲しいときはdryRun = 1とする。
+{
+    int isMovable = movable(y1, x1, y2, x2, nari, verbose);
+
+    if (!isMovable)
+        return WILL_LOSE;
+
+    printf("move(y1=%d, x1=%d, y2=%d, x2=%d, nari=%d, n=%d, dryRun=%d )\n", y1, x1, y2, x2, nari, n, dryRun);
+
+    int gotKoma = gBoard[y2][x2];
+    if (gotKoma == KING)
+        return WILL_WIN;
+
+    if (gotKoma != NONE) // 相手の駒を取る
+        gKomaStock[gTurn][getBaseKoma(gotKoma)]++;
+
+    int koma = gBoard[y1][x1];
+
+    // 駒を移動させる
+    gBoard[y2][x2] = (nari ? getSuperKoma(koma) : koma);
+    gWhich[y2][x2] = gWhich[y1][x1];
+    gBoard[y1][x1] = NONE;
+    gWhich[y1][x1] = NEUTRAL;
+    gCnt++;
+
+    int judgeResult = judge(n, verbose);
+
+    if (dryRun) // dryRunなら元に戻す
+    {
+        gBoard[y1][x1] = (nari ? getBaseKoma(koma) : koma);
+        gWhich[y1][x1] = gTurn;
+        gBoard[y2][x2] = NONE;
+        gWhich[y2][x2] = NEUTRAL;
+
+        if (gotKoma != NONE)
+        { // 取った駒を元に戻す
+            gKomaStock[gTurn][getBaseKoma(gotKoma)]--;
+            gBoard[y2][x2] = gotKoma;
+            gWhich[y2][x2] = (gTurn == PLAYER ? AI : PLAYER);
+        }
+        gCnt--;
+    }
+
+    return judgeResult;
+}
+
 int place(int y, int x, int koma, int n, int dryRun, int verbose)
 // n手先まで読んで勝てるならWILL_WIN、負けるならWILL_LOSE、いずれでもないならEQUAL_FIGHTを返す。
 // 打ち歩詰め以外の反則手が渡された場合は0手先で負けるとみなす。

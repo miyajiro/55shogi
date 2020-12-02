@@ -118,3 +118,92 @@ int gVL[10];
 int main()
 {
 }
+
+
+char *int2KomaName(int n)
+{
+    switch (n)
+    {
+    case FU:
+        return "FU";
+    case GIN:
+        return "GI";
+    case KAKU:
+        return "KK";
+    case HISHA:
+        return "HI";
+    case KIN:
+        return "KI";
+    case KING:
+        return "KG";
+    case TOKIN:
+        return "TK";
+    case NARIGIN:
+        return "NG";
+    case UMA:
+        return "UM";
+    case RYU:
+        return "RY";
+    case NONE:
+        return "--";
+    }
+}
+
+int komaName2Int(char *s)
+{
+    if (strcmp(s, "FU") == 0)
+        return FU;
+    if (strcmp(s, "GI") == 0)
+        return GIN;
+    if (strcmp(s, "KK") == 0)
+        return KAKU;
+    if (strcmp(s, "HI") == 0)
+        return HISHA;
+    if (strcmp(s, "KI") == 0)
+        return KIN;
+    if (strcmp(s, "KG") == 0)
+        return KING;
+    if (strcmp(s, "TK") == 0)
+        return TOKIN;
+    if (strcmp(s, "NG") == 0)
+        return NARIGIN;
+    if (strcmp(s, "UM") == 0)
+        return UMA;
+    if (strcmp(s, "RY") == 0)
+        return RYU;
+    return -1;
+}
+
+int getBaseKoma(int koma)
+{
+    switch (koma)
+    {
+    case TOKIN:
+        return FU;
+    case NARIGIN:
+        return GIN;
+    case UMA:
+        return KAKU;
+    case RYU:
+        return HISHA;
+    default:
+        return koma;
+    }
+}
+
+int getSuperKoma(int koma)
+{
+    switch (koma)
+    {
+    case FU:
+        return TOKIN;
+    case GIN:
+        return NARIGIN;
+    case KAKU:
+        return UMA;
+    case HISHA:
+        return RYU;
+    default:
+        return koma;
+    }
+}

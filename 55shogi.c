@@ -242,3 +242,33 @@ int getVX(int koma, int i)
     return gVX[koma][i];
 }
 
+void show()
+{
+    int i, j;
+    puts("    A | B | C | D | E");
+    for (i = 4; i >= 0; i--)
+    {
+        printf("%d ", i + 1);
+        for (j = 0; j < 5; j++)
+        {
+            if (gBoard[i][j] == NONE)
+            {
+                printf("|...");
+                continue;
+            }
+            printf(gWhich[i][j] == PLAYER ? "|p" : "|a");
+            printf(int2KomaName(gBoard[i][j]));
+        }
+        puts("|");
+    }
+    puts("");
+    puts("   FU GI KK HI KI");
+    printf("p ");
+    for (i = 0; i < 5; i++)
+        printf("  %d", gKomaStock[PLAYER][i]);
+    printf("\na ");
+    for (i = 0; i < 5; i++)
+        printf("  %d", gKomaStock[AI][i]);
+
+    puts("\n");
+}

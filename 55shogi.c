@@ -231,3 +231,14 @@ int getSuperKoma(int koma)
         return koma;
     }
 }
+
+int getVY(int koma, int i)
+{
+    return gTurn == PLAYER ? gVY[koma][i] : -gVY[koma][i];
+}
+
+int getVX(int koma, int i)
+{
+    return gVX[koma][i];
+}
+

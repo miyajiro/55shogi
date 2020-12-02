@@ -285,7 +285,68 @@ int isInTekijin(int y) // 敵陣の中なら1, そうでないなら0
         return y == 0;
 }
 
+int sameBoardLog(int x, int y) // x手目とy手目の盤面、持ち駒、手番が同じなら1を返す。
+{
+    int i, j;
+    if (x % 2 != y % 2)
+        return 0;
 
+    for (i = 0; i < 5; i++)
+        for (j = 0; j < 5; j++)
+            if (gBoardLog[x][i][j] != gBoardLog[y][i][j] || gWhichLog[x][i][j] != gWhichLog[y][i][j])
+                return 0;
+
+    for (i = 0; i < 2; i++)
+        for (j = 0; j < 5; j++)
+            if (gKomaStockLog[x][i][j] != gKomaStockLog[y][i][j])
+                return 0;
+
+    return 1;
+}
+
+void writeOuteLog() //　gCnt手目で王手であったかどうかのログをgOuteLogに記録する。
+{
+    int y1, x1, y2, x2, k, koma;
+
+    gOuteLog[gCnt] = 0;
+    for (y1 = 0; y1 < 5; y1++)
+        for (x1 = 0; x1 < 5; x1++)
+        {
+            if (gWhich[y1][x1] != gTurn)
+                continue;
+
+            koma = gBoard[y1][x1];
+            for (k = 0; k < gVL[koma]; k++)
+            {
+                y2 = y1 + getVY(koma, k);
+                x2 = x1 + getVX(koma, k);
+
+                if (movable(y1, x1, y2, x2, 0, 0) && gBoard[y2][x2] == KING)
+                    gOuteLog[gCnt] = 1;
+            }
+        }
+}
+
+int writeLogAndCheckSennnichite() // ログを記録し、千日手であるならFOUL_PLAY, そうでなりならVALID_PLAYを返す。
+{
+    int i, j, k;
+    for (i = 0; i < 5; i++)
+        for (j = 0; j < 5; j++)
+        {
+            gBoardLog[gCnt][i][j] = gBoard[i][j];
+            gWhichLog[gCnt][i][j] = gWhich[i][j];
+        }
+
+    for (i = 0; i < 2; i++)
+        for (j = 0; j < 5; j++)
+            gKomaStockLog[gCnt][i][j] = gKomaStock[i][j];
+
+    int sameBoardCnt = 0;
+    for (i = 0; i < gCnt; i++)
+        sameBoardCnt += sameBoardLog(i, gCnt);
+
+    return (sameBoardCnt >= 4 ? FOUL_PLAY : VALID_PLAY);
+}
 
 int movable(int y1, int x1, int y2, int x2, int nari, int verbose)
 // 動かせるなら1, 動かせないなら0を返す

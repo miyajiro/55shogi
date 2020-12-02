@@ -321,6 +321,82 @@ int ai() // プレイヤーの勝ちならPLAYER_WIN, 負けならAI_WIN, 続け
     }
 }
 
+void initVYVX()
+{
+    gVY[FU] = gFU_VY;
+    gVX[FU] = gFU_VX;
+    gVL[FU] = 1;
+    gVY[GIN] = gGI_VY;
+    gVX[GIN] = gGI_VX;
+    gVL[GIN] = 5;
+    gVY[KAKU] = gKK_VY;
+    gVX[KAKU] = gKK_VX;
+    gVL[KAKU] = 16;
+    gVY[HISHA] = gHI_VY;
+    gVX[HISHA] = gHI_VX;
+    gVL[HISHA] = 16;
+    gVY[KIN] = gKI_VY;
+    gVX[KIN] = gKI_VX;
+    gVL[KIN] = 6;
+    gVY[KING] = gKG_VY;
+    gVX[KING] = gKG_VX;
+    gVL[KING] = 8;
+    gVY[TOKIN] = gTK_VY;
+    gVX[TOKIN] = gTK_VX;
+    gVL[TOKIN] = 6;
+    gVY[NARIGIN] = gNG_VY;
+    gVX[NARIGIN] = gNG_VX;
+    gVL[NARIGIN] = 6;
+    gVY[UMA] = gUM_VY;
+    gVX[UMA] = gUM_VX;
+    gVL[UMA] = 20;
+    gVY[RYU] = gRY_VY;
+    gVX[RYU] = gRY_VX;
+    gVL[RYU] = 20;
+}
+
+void initBoard()
+{
+    int i, j;
+    for (i = 0; i < 5; i++)
+        for (j = 0; j < 5; j++)
+        {
+            gBoard[i][j] = NONE;
+            gWhich[i][j] = NEUTRAL;
+        }
+
+    gBoard[0][0] = KING;
+    gWhich[0][0] = PLAYER;
+    gBoard[0][1] = KIN;
+    gWhich[0][1] = PLAYER;
+    gBoard[0][2] = GIN;
+    gWhich[0][2] = PLAYER;
+    gBoard[0][3] = KAKU;
+    gWhich[0][3] = PLAYER;
+    gBoard[0][4] = HISHA;
+    gWhich[0][4] = PLAYER;
+    gBoard[1][0] = FU;
+    gWhich[1][0] = PLAYER;
+
+    gBoard[4][0] = HISHA;
+    gWhich[4][0] = AI;
+    gBoard[4][1] = KAKU;
+    gWhich[4][1] = AI;
+    gBoard[4][2] = GIN;
+    gWhich[4][2] = AI;
+    gBoard[4][3] = KIN;
+    gWhich[4][3] = AI;
+    gBoard[4][4] = KING;
+    gWhich[4][4] = AI;
+    gBoard[3][4] = FU;
+    gWhich[3][4] = AI;
+}
+
+void init()
+{
+    initVYVX();
+    initBoard();
+}
 
 void game()
 {

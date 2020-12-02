@@ -287,6 +287,139 @@ int isInTekijin(int y) // 敵陣の中なら1, そうでないなら0
 
 
 
+int movable(int y1, int x1, int y2, int x2, int nari, int verbose)
+// 動かせるなら1, 動かせないなら0を返す
+{
+    int i;
+    if (!onTheBoard(y1, x1) || !onTheBoard(y2, x2))
+    { // 盤上でないなら動かせない
+        if (verbose)
+            puts("盤上ではないので動かせない");
+        return 0;
+    }
+
+    if (gWhich[y1][x1] != gTurn)
+    { // 動かす側に属する駒が置かれていないなら0
+        if (verbose)
+            puts("動かす側に属する駒が置かれていない");
+        return 0;
+    }
+    int koma = gBoard[y1][x1];
+
+    int dy = y2 - y1; // 変位ベクトルのx成分
+    int dx = x2 - x1; // 変位ベクトルのy成分
+    int d = max(abs(dy), abs(dx));
+    int ey = dy / d; // 変位方向の単位ベクトルx成分
+    int ex = dx / d; // 変位方向の単位ベクトルy成分
+
+    int isPossibleMove = 0;
+    for (i = 0; i < gVL[koma]; i++)
+        if (getVY(koma, i) == dy && getVX(koma, i) == dx)
+            isPossibleMove = 1; // 駒の動かし方と変位が一致すれば1になる変数
+
+    if (!isPossibleMove)
+    { // 駒にとって不可能な動きなので0
+        if (verbose)
+            puts("駒にとって不可能な動きである。");
+        return 0;
+    }
+
+    for (i = 1; i < d; i++)
+        if (gWhich[y1 + ey * i][x1 + ex * i] != NONE) // 駒は別の駒を飛び越えられない
+        {
+            if (verbose)
+                puts("駒は別の駒を飛び越えられない");
+            return 0;
+        }
+
+    if (gWhich[y2][x2] == gTurn) // 動かした先に自分の駒があるなら反則
+    {
+        if (verbose)
+            puts("動かした先に自分の駒がある");
+        return 0;
+    }
+
+    if (nari)
+    {
+        if (!isInTekijin(y1) && !isInTekijin(y2))
+        { // 敵陣内を移動しないときに成れない
+            if (verbose)
+                puts("敵陣内を移動しないときに成れない");
+            return 0;
+        }
+
+        if (!(koma == FU || koma == GIN || koma == KAKU || koma == HISHA))
+        { // 成れるコマでないときは成れない
+            if (verbose)
+                puts("成れる駒でないときは成れない");
+            return 0;
+        }
+    }
+    else
+    {
+        if (koma == FU && isInTekijin(y2))
+        { // 敵陣に入る歩は必ず成らなければならない。
+            if (verbose)
+                puts("敵陣に入る歩は必ず成らなければならない");
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+int placable(int y, int x, int koma, int verbose)
+// 打てるなら1, 打てないなら0を返す
+{
+    int i;
+
+    if (!onTheBoard(y, x))
+    { // 盤上でないなら打てない
+        if (verbose)
+            puts("盤上でないなら打てない");
+        return 0;
+    }
+    if (!(koma == FU || koma == GIN || koma == KAKU || koma == HISHA || koma == KIN)) // ストックできる駒以外は打てない
+    {
+        if (verbose)
+            puts("ストックできる駒以外は打てない");
+        return 0;
+    }
+    if (gKomaStock[gTurn][koma] == 0)
+    { // 持っていない駒は打てない
+        if (verbose)
+            puts("持っていない駒は打てない");
+        return 0;
+    }
+
+    if (gWhich[y][x] != NEUTRAL)
+    { // 駒が置かれている場所に打てない
+        if (verbose)
+            puts("駒が置かれている場所に打てない");
+        return 0;
+    }
+
+    if (koma == FU)
+    {
+        for (i = 0; i < 5; i++) // 二歩は打てない
+            if (gBoard[i][x] == FU && gWhich[i][x] == gTurn)
+            {
+                if (verbose)
+                    puts("二歩");
+                return 0;
+            }
+
+        if (isInTekijin(y)) // 歩を敵陣に打てない
+        {
+            if (verbose)
+                puts("歩を敵陣に打てない");
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 int executeOrder(char *order) // 相手を詰ませたらCHECK_MATE, 反則ならFOUL_PLAY, いずれでもないならVALID_PLAY
 {
     int i, j, res;

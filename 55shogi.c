@@ -348,6 +348,97 @@ int writeLogAndCheckSennnichite() // ログを記録し、千日手であるな�
     return (sameBoardCnt >= 4 ? FOUL_PLAY : VALID_PLAY);
 }
 
+int judge(int n, int verbose)
+{
+    // 操作を行った後に呼ぶ。
+    // 操作後n手先以内に必勝であればWILL_WIN
+    // n手以内に必敗であればWILL_LOSE
+    // そうでなければEQUAL_FIGHTを返す
+
+    // 移動した結果が王手であったかどうかを記録する。
+    writeOuteLog();
+
+    if (writeLogAndCheckSennnichite() == FOUL_PLAY) // 千日手が成立する場合
+    {
+        if (gCnt >= 2 && gOuteLog[gCnt] && gOuteLog[gCnt - 2]) // 連続王手による千日手
+        {
+            if (verbose)
+                puts("連続王手による千日手の場合、王手を掛けている側が手を変えなければなりません。");
+            return WILL_LOSE;
+        }
+        else
+        {
+            if (verbose) // 通常の千日手は先手の負け
+                puts("千日手が成立すると、先手側の負けとなります。");
+            return (gSente == gTurn ? WILL_LOSE : WILL_WIN);
+        }
+    }
+
+    if (n == 0)
+        return EQUAL_FIGHT;
+
+    swapTurn(); // 一時的に相手に手番を切り替える
+
+    int y, x, y1, x1, y2, x2, k, koma;
+    int res = WILL_WIN;
+    int opponentChance, opponentNariChance;
+
+    for (y1 = 0; y1 < 5; y1++)
+        for (x1 = 0; x1 < 5; x1++)
+        {
+            if (gWhich[y1][x1] != gTurn)
+                continue;
+
+            koma = gBoard[y1][x1];
+            for (k = 0; k < gVL[koma]; k++)
+            {
+                y2 = y1 + getVY(koma, k);
+                x2 = x1 + getVX(koma, k);
+
+                opponentChance = move(y1, x1, y2, x2, 0, n - 1, 1, 0);
+                opponentNariChance = move(y1, x1, y2, x2, 1, n - 1, 1, 0);
+
+                if (opponentChance == WILL_WIN || opponentNariChance == WILL_WIN)
+                { // 相手がn-1手以内に必勝の場合負ける
+                    swapTurn();
+                    return WILL_LOSE;
+                }
+
+                if (opponentChance != WILL_LOSE || opponentNariChance != WILL_LOSE)
+                    // 相手にn-1手以内に負け回避のチャンスがある場合自分は必勝ではない。
+                    res = EQUAL_FIGHT;
+            }
+        }
+
+    for (k = 0; k < 5; k++)
+    {
+        if (gKomaStock[gTurn][k] == 0)
+            continue;
+
+        for (y = 0; y < 5; y++)
+            for (x = 0; x < 5; x++)
+            {
+                if (gWhich[y][x] != NEUTRAL)
+                    continue;
+
+                opponentChance = place(y, x, k, n - 1, 1, 0);
+
+                if (opponentChance == WILL_WIN)
+                {
+                    // 相手がn-1手以内に必勝の場合負ける
+                    swapTurn();
+                    return WILL_LOSE;
+                }
+
+                if (opponentChance != WILL_LOSE)
+                    // 相手にn-1手以内に負け回避のチャンスがある場合自分は必勝ではない。
+                    res = EQUAL_FIGHT;
+            }
+    }
+
+    swapTurn(); // 一時的に切り替えた手番を戻す
+    return res;
+}
 
 int move(int y1, int x1, int y2, int x2, int nari, int n, int dryRun, int verbose)
 // n手先まで読んで勝てるならWILL_WIN、負けるならWILL_LOSE、いずれでもないならEQUAL_FIGHTを返す。

@@ -814,6 +814,8 @@ void init()
 {
     initVYVX();
     initBoard();
+    writeOuteLog();
+    writeLogAndCheckSennnichite();
 }
 
 void game()

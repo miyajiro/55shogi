@@ -44,7 +44,7 @@ int isInTekijin(int y);
 int sameBoardLog(int x, int y);
 void writeOuteLog();
 int writeLogAndCheckSennnichite();
-int judge(int n, int verbose);
+int judge(int n, int verbose, int dryRun);
 int move(int y1, int x1, int y2, int x2, int nari, int n, int dryRun, int verbose);
 int movable(int y1, int x1, int y2, int x2, int nari, int verbose);
 int place(int y, int x, int koma, int n, int dryRun, int verbose);
@@ -345,10 +345,10 @@ int writeLogAndCheckSennnichite() // ログを記録し、千日手であるな�
     for (i = 0; i < gCnt; i++)
         sameBoardCnt += sameBoardLog(i, gCnt);
 
-    return (sameBoardCnt >= 4 ? FOUL_PLAY : VALID_PLAY);
+    return (sameBoardCnt >= 3 ? FOUL_PLAY : VALID_PLAY);
 }
 
-int judge(int n, int verbose)
+int judge(int n, int verbose, int dryRun)
 {
     // 操作を行った後に呼ぶ。
     // 操作後n手先以内に必勝であればWILL_WIN
@@ -360,17 +360,20 @@ int judge(int n, int verbose)
 
     if (writeLogAndCheckSennnichite() == FOUL_PLAY) // 千日手が成立する場合
     {
-        if (gCnt >= 2 && gOuteLog[gCnt] && gOuteLog[gCnt - 2]) // 連続王手による千日手
+        if (!dryRun) // 実際に動かす場合にのみ千日手の判定を返す
         {
-            if (verbose)
-                puts("連続王手による千日手の場合、王手を掛けている側が手を変えなければなりません。");
-            return WILL_LOSE;
-        }
-        else
-        {
-            if (verbose) // 通常の千日手は先手の負け
-                puts("千日手が成立すると、先手側の負けとなります。");
-            return (gSente == gTurn ? WILL_LOSE : WILL_WIN);
+            if (gCnt >= 2 && gOuteLog[gCnt] && gOuteLog[gCnt - 2]) // 連続王手による千日手
+            {
+                if (verbose)
+                    puts("連続王手による千日手の場合、王手を掛けている側が手を変えなければなりません。");
+                return WILL_LOSE;
+            }
+            else
+            {
+                if (verbose) // 通常の千日手は先手の負け
+                    puts("千日手が成立すると、先手側の負けとなります。");
+                return (gSente == gTurn ? WILL_LOSE : WILL_WIN);
+            }
         }
     }
 
@@ -468,7 +471,7 @@ int move(int y1, int x1, int y2, int x2, int nari, int n, int dryRun, int verbos
     gWhich[y1][x1] = NEUTRAL;
     gCnt++;
 
-    int judgeResult = judge(n, verbose);
+    int judgeResult = judge(n, verbose, dryRun);
 
     if (dryRun) // dryRunなら元に戻す
     {
@@ -505,7 +508,7 @@ int place(int y, int x, int koma, int n, int dryRun, int verbose)
     gBoard[y][x] = koma;
     gCnt++;
 
-    int judgeResult = judge(n, verbose);
+    int judgeResult = judge(n, verbose, dryRun);
 
     if (dryRun)
     {

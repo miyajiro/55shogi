@@ -453,7 +453,7 @@ int move(int y1, int x1, int y2, int x2, int nari, int n, int dryRun, int verbos
     if (!isMovable)
         return WILL_LOSE;
 
-    printf("move(y1=%d, x1=%d, y2=%d, x2=%d, nari=%d, n=%d, dryRun=%d )\n", y1, x1, y2, x2, nari, n, dryRun);
+    // printf("move(y1=%d, x1=%d, y2=%d, x2=%d, nari=%d, n=%d, dryRun=%d )\n", y1, x1, y2, x2, nari, n, dryRun);
 
     int gotKoma = gBoard[y2][x2];
     if (gotKoma == KING)
@@ -497,7 +497,7 @@ int place(int y, int x, int koma, int n, int dryRun, int verbose)
 // 打ち歩詰め以外の反則手が渡された場合は0手先で負けるとみなす。
 // 引数のdryRunについて、実際に駒を動かさず駒を試しに動かしてみた結果のみが欲しいときはdryRun = 1とする。
 {
-    printf("place(y=%d, x=%d, koma=%d, n=%d, dryRun=%d)\n", y, x, koma, n, dryRun);
+    // printf("place(y=%d, x=%d, koma=%d, n=%d, dryRun=%d)\n", y, x, koma, n, dryRun);
     int isPlacable = placable(y, x, koma, verbose);
 
     if (!isPlacable)
